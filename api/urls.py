@@ -1,6 +1,7 @@
 from django.conf.urls import url
-from .views import API1
+from .views import CashAndBackupAccountView
 
 urlpatterns = [
-    url(r'^api1/$', API1.as_view(), name='api1'),
+    url(r'^cash_and_backup/$', CashAndBackupAccountView.as_view(), name='cash-and-backup'),
+    url(r'^cash_and_backup/(?P<pk>\d+)/$', CashAndBackupAccountView.as_view(), name='cash-and-backup-item'),
 ]

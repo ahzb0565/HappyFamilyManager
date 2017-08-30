@@ -5,13 +5,6 @@ FINANCIAL_ACCOUNT_TYPE = (
     ('debt', 'Borrow or lend, house loan, car loan, personal loan and so on'),
 )
 
-CAPITAL_TYPE = (
-    ('cash', 'Floating capital'),
-    ('spare', 'Spare founds'),
-    ('deposit', 'Bank saving etc.'),
-    ('zhifubao', 'Zhifubao or Yuebao'),
-)
-
 INSURANCE_TYPE = (
     ('accident', 'Accident insurance'),
     ('health', 'Illness insurance'),
