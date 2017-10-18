@@ -23,4 +23,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(urls, namespace='api')),
     url(r'^$', TemplateView.as_view(template_name='home.html'), name='home'),
+    url(r'^details/$', TemplateView.as_view(template_name='details.html'), name='details'),
+    url(r'^new/$', TemplateView.as_view(template_name='new.html'), name='new'),
 ]
