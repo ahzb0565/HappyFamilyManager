@@ -1,7 +1,7 @@
 from django.conf.urls import url
-from .views import CashAndBackupAccountView
+from .views import MonthlyReportView
 
 urlpatterns = [
-    url(r'^cash_and_backup/$', CashAndBackupAccountView.as_view(), name='cash-and-backup'),
-    url(r'^cash_and_backup/(?P<pk>\d+)/$', CashAndBackupAccountView.as_view(), name='cash-and-backup-item'),
+    url(r'^monthly_report/$', MonthlyReportView.as_view(), name='monthly-report'),
+    url(r'^monthly_report/(?P<pk>\d+)/$', MonthlyReportView.as_view(), name='monthly-report-item'),
 ]
