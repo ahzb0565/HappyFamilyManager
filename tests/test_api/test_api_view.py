@@ -1,94 +1,79 @@
 from django.test import TestCase
 from django.urls.base import reverse
-from tests.factories import MonthlyReportFactory, CashAndBackupAccountFactory, InsuranceAccountFactory, InvestmentAccountFactory,\
-    IncomeFactory, OutgoingFactory
-from api.models import MonthlyReport
-from datetime import datetime, timedelta
+from tests.factories import ItemFactory, MonthReportFactory
+from api.models import Item, MonthReport
+from datetime import date
 
 
-class MonthlyReportTestCases(TestCase):
-    def setUp(self):
-        self.monthly_report = MonthlyReportFactory.create()
-        CashAndBackupAccountFactory.create(month=self.monthly_report)
-        InsuranceAccountFactory.create(month=self.monthly_report)
-        InvestmentAccountFactory.create(month=self.monthly_report)
-        IncomeFactory.create(month=self.monthly_report)
-        OutgoingFactory.create(month=self.monthly_report)
-
-    def test_cash_n_bk_view_get_list(self):
-        response = self.client.get(reverse('api:monthly-report'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()), 1)
-
-    def test_cash_n_bk_view_get_item(self):
-        response = self.client.get(reverse('api:monthly-report-item', kwargs={'pk': self.monthly_report.pk}))
-        expected_result = {
-            u"outgoings":[
-                {
-                    u"money":self.monthly_report.outgoings.first().money,
-                    u"id":self.monthly_report.outgoings.first().id,
-                    u"comments":u"Outgoing comments",
-                    u"name":u"Outgoing 1"
-                }
-            ],
-            u"insurances":[
-                {
-                    u"name":u"Insurance 1",
-                    u"end_date":datetime.today() + timedelta(days=365),
-                    u"comments":u"Insurance comments",
-                    u"id":self.monthly_report.insurances.first().id,
-                    u"type":u"accident",
-                    u"start_date":datetime.today()
-                }
-            ],
-            u"incomes":[
-                {
-                    u"money":self.monthly_report.incomes.first().money,
-                    u"id":self.monthly_report.incomes.first().id,
-                    u"comments":u"Income comments",
-                    u"name":u"Income 1"
-                }
-            ],
-            u"comments":u"comments 1",
-            u"cashes":[
-                {
-                    u"money":self.monthly_report.cashes.first().money,
-                    u"id":self.monthly_report.cashes.first().id,
-                    u"comments":u"cash comments",
-                    u"name":u"cash 1"
-                }
-            ],
-            u"date":datetime.today(),
-            u"investments":[
-                {
-                    u"money":self.monthly_report.investments.first().money,
-                    u"id":self.monthly_report.investments.first().id,
-                    u"comments":u"investment comments",
-                    u"name":u"investment 1"
-                }
-            ],
-            u"id":self.monthly_report.id
-        }
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['id'], expected_result['id'])
-        self.assertEqual(response.json()['outgoings'][0]['id'], expected_result['outgoings'][0]['id'])
-        self.assertEqual(response.json()['insurances'][0]['id'], expected_result['insurances'][0]['id'])
-        self.assertEqual(response.json()['cashes'][0]['id'], expected_result['cashes'][0]['id'])
-        self.assertEqual(response.json()['investments'][0]['id'], expected_result['investments'][0]['id'])
-
-
-    def test_cash_n_bk_view_get_item_404(self):
-        id = self.monthly_report.pk
-        MonthlyReport.objects.all().delete()
-        response = self.client.get(reverse('api:monthly-report-item', kwargs={'pk': id}))
-        self.assertEqual(response.status_code, 404)
-
-    def test_cash_n_bk_view_create(self):
-        MonthlyReport.objects.all().delete()
-        data = {
-            'comments': 'comments'
-        }
-        response = self.client.post(reverse('api:monthly-report'), data=data)
+class ReportTestCase(TestCase):
+    def test_create_report(self):
+        response = self.client.get(reverse('api:create-report'))
         self.assertEqual(response.status_code, 201)
-        result = MonthlyReport.objects.first()
-        self.assertEqual(result.comments, 'comments')
+        self.assertEqual(MonthReport.objects.all().count(), 1)
+        report = MonthReport.objects.first()
+        self.assertEqual(report.date, date.today())
+        self.assertEqual(report.total, 0)
+        self.assertEqual(report.income, 0)
+        self.assertEqual(report.outcome, 0)
+
+    def test_delete_report(self):
+        report = MonthReportFactory.create()
+        response = self.client.get(reverse('api:delete-report', kwargs={'pk': report.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(MonthReport.objects.all().count(), 0)
+
+    def test_get_reports(self):
+        report1 = MonthReportFactory.create()
+        report2 = MonthReportFactory.create()
+        response = self.client.get(reverse('api:get-reports'))
+        self.assertEqual(response.status_code, 200)
+        data = response.data
+        self.assertEqual(len(data), 2)
+        self.assertEqual({i['id'] for i in data}, {report1.id, report2.id})
+
+    def test_get_report(self):
+        report = MonthReportFactory.create()
+        response = self.client.get(reverse('api:get-report', kwargs={'pk': report.id}))
+        self.assertEqual(response.status_code, 200)
+        data = response.data
+        self.assertEqual(data['id'], report.id)
+
+
+class ItemTestCase(TestCase):
+
+    def test_create_item_success(self):
+        report = MonthReportFactory.create()
+        data = {
+            'month': report.id,
+            'name': 'item 1',
+            'type': 'type 1',
+            'value': 100,
+            'comment': 'comments'
+        }
+        response = self.client.post(reverse('api:create-item'), data=data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Item.objects.all().count(), 1)
+        self.assertEqual(Item.objects.first().name, 'item 1')
+
+    def test_delete_item_success(self):
+        item = ItemFactory.create()
+        response = self.client.get(reverse('api:delete-item', kwargs={'pk': item.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Item.objects.all().count(), 0)
+
+    def test_get_item_success(self):
+        item = ItemFactory.create()
+        response = self.client.get(reverse('api:get-item', kwargs={'pk': item.id}))
+        self.assertEqual(response.status_code, 200)
+        data = response.data
+        self.assertEqual(data['id'], item.id)
+
+    def test_get_items_success(self):
+        item1 = ItemFactory.create()
+        item2 = ItemFactory.create()
+        response = self.client.get(reverse('api:get-items'))
+        self.assertEqual(response.status_code, 200)
+        data = response.data
+        self.assertEqual(len(data), 2)
+        self.assertEqual({i['id'] for i in data}, {item1.id, item2.id})
+

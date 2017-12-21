@@ -13,26 +13,9 @@
         <a href="/new" ><button style="float: right; margin-top: 30px;" class="btn btn-primary">新建账单</button></a>
     </div>
 
-    <div class="lit-group">
-        <a href="/details" class="list-group-item">
-            <h4 class="list-group-item-heading">2017.10.01</h4>
-            <p class="list-group-item-text">总共xxx， 收入xxx， 支出，xxx</p>
-        </a>
-        <a href="/details" class="list-group-item">
-            <h4 class="list-group-item-heading">2017.09.01</h4>
-            <p class="list-group-item-text">总共xxx， 收入xxx， 支出，xxx</p>
-        </a>
-        <a href="/details" class="list-group-item">
-            <h4 class="list-group-item-heading">2017.08.01</h4>
-            <p class="list-group-item-text">总共xxx， 收入xxx， 支出，xxx</p>
-        </a>
-        <a href="/details" class="list-group-item">
-            <h4 class="list-group-item-heading">2017.07.01</h4>
-            <p class="list-group-item-text">总共xxx， 收入xxx， 支出，xxx</p>
-        </a>
-    </div>
+    <div id="reports"></div>
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{% static 'dist/index.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dist/home.bundle.js' %}"></script>
 {% endblock %}

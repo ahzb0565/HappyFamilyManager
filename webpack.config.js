@@ -1,10 +1,13 @@
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
-  entry: './src/js/index.jsx',
+  entry: {
+    index: './src/js/index.jsx',
+    home: './src/js/home.jsx'
+  },
   output: {
     path: __dirname + '/static/dist',  //abs path
-    filename: 'index.js'
+    filename: '[name].bundle.js'
   },
   module: {
     loaders: [
@@ -17,6 +20,11 @@ module.exports = {
         {
             from: 'node_modules/bootstrap/dist/css/bootstrap.min.css'
         }
-    ])
+    ]),
+    new CopyWebpackPlugin([
+        {
+            from: 'node_modules/jquery/dist/jquery.min.js'
+        }
+    ]),
   ]
 };

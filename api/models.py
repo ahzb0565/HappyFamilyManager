@@ -1,48 +1,23 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from .constants import *
 
 
-class MonthlyReport(models.Model):
+class MonthReport(models.Model):
     date = models.DateField(auto_now_add=True)
-    comments = models.TextField()
+    total = models.IntegerField(default=0)
+    income = models.IntegerField(default=0)
+    outcome = models.IntegerField(default=0)
 
 
-class CashAndBackupAccount(models.Model):
-    month = models.ForeignKey(MonthlyReport, related_name='cashes')
-    name = models.CharField(max_length=50, blank=False)
-    money = models.FloatField(default=0)
-    comments = models.TextField()
+class Item(models.Model):
+    month = models.ForeignKey(MonthReport, related_name='items')
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=50)
+    value = models.IntegerField()
+    comment = models.TextField(blank=True)
 
-
-class InvestmentAccount(models.Model):
-    month = models.ForeignKey(MonthlyReport, related_name='investments')
-    name = models.CharField(blank=False, max_length=50)
-    money = models.FloatField(default=0)
-    comments = models.TextField()
-
-
-class InsuranceAccount(models.Model):
-    month = models.ForeignKey(MonthlyReport, related_name='insurances')
-    name = models.CharField(blank=False, max_length=50)
-    type = models.CharField(max_length=10, default=INSURANCE_TYPE[0][0], choices=INSURANCE_TYPE)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    comments = models.TextField()
-
-
-class Income(models.Model):
-    month = models.ForeignKey(MonthlyReport, related_name='incomes')
-    name = models.CharField(blank=False, max_length=50)
-    money = models.FloatField(default=0)
-    comments = models.TextField()
-
-
-class Outgoing(models.Model):
-    month = models.ForeignKey(MonthlyReport, related_name='outgoings')
-    name = models.CharField(blank=False, max_length=50)
-    money = models.FloatField(default=0)
-    comments = models.TextField()
+    def __unicode__(self):
+        return '{}, {}, {}'.format(self.name, self.type, self.value)
 
 
