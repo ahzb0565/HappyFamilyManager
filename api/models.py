@@ -4,7 +4,7 @@ from django.db import models
 
 
 class MonthReport(models.Model):
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(blank=False, primary_key=True)
     total = models.IntegerField(default=0)
     income = models.IntegerField(default=0)
     outcome = models.IntegerField(default=0)

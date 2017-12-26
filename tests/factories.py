@@ -1,14 +1,13 @@
 import factory
 from api.models import Item, MonthReport
-from api.constants import INSURANCE_TYPE
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 import random
 
 
 class MonthReportFactory(factory.DjangoModelFactory):
     class Meta:
         model = MonthReport
-
+    date = date.today() - timedelta(days=random.randint(1, 100))
     total = 0
     income = 0
     outcome = 0

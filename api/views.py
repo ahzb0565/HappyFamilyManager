@@ -2,8 +2,8 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets
 from .serializers import ItemSerializer, MonthReportSerializer
 from .models import Item, MonthReport
-from django.shortcuts import get_object_or_404
-from datetime import date
+from django.shortcuts import get_object_or_404, redirect
+from datetime import date, datetime
 
 
 class MonthReportView(viewsets.ViewSet):
@@ -17,14 +17,16 @@ class MonthReportView(viewsets.ViewSet):
         serializer = MonthReportSerializer(instance=instance, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def create(self, request):
-        today = date.today()
-        if MonthReport.objects.filter(date=today):
-            return Response({'error': 'Report exists for date {}'.format(today)}, status=status.HTTP_400_BAD_REQUEST)
-        serializer = MonthReportSerializer(data={'date': date.today()})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+    def create(self, request, day=None):
+        '''
+        :param date:  2017-01-01
+        '''
+        if day:
+            day = datetime.strptime(day, "%Y-%m-%d").date()
+        else:
+            day = date.today()
+        report, result = MonthReport.objects.get_or_create(date=day)
+        return redirect('api:get-report', pk=report.date)
 
     def delete(self, request, pk=None):
         instance = get_object_or_404(MonthReport, pk=pk)
