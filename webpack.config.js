@@ -3,7 +3,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
   entry: {
     index: './src/js/index.jsx',
-    home: './src/js/home.jsx'
+    home: './src/js/home.jsx',
+    create_new: './src/js/new.jsx'
   },
   output: {
     path: __dirname + '/static/dist',  //abs path
@@ -20,11 +21,6 @@ module.exports = {
         {
             from: 'node_modules/bootstrap/dist/css/bootstrap.min.css'
         }
-    ]),
-    new CopyWebpackPlugin([
-        {
-            from: 'node_modules/jquery/dist/jquery.min.js'
-        }
-    ]),
+    ])
   ]
 };

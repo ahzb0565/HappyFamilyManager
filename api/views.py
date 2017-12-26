@@ -1,9 +1,15 @@
 from rest_framework.response import Response
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, decorators
 from .serializers import ItemSerializer, MonthReportSerializer
 from .models import Item, MonthReport
 from django.shortcuts import get_object_or_404, redirect
 from datetime import date, datetime
+from .constants import ACCOUNT_TYPES
+
+
+@decorators.api_view(http_method_names=['GET'])
+def account_types(request):
+    return Response(data=[_[0] for _ in ACCOUNT_TYPES], status=status.HTTP_200_OK)
 
 
 class MonthReportView(viewsets.ViewSet):

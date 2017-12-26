@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from .constants import ACCOUNT_TYPES
 
 
 class MonthReport(models.Model):
@@ -13,7 +14,7 @@ class MonthReport(models.Model):
 class Item(models.Model):
     month = models.ForeignKey(MonthReport, related_name='items')
     name = models.CharField(max_length=100)
-    type = models.CharField(max_length=50)
+    type = models.CharField(choices=ACCOUNT_TYPES, default=ACCOUNT_TYPES[0][0], max_length=50)
     value = models.IntegerField()
     comment = models.TextField(blank=True)
 

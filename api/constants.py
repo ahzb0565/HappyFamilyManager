@@ -47,3 +47,11 @@ STATUS = (
     ('terminated', 'Terminated'),
     ('inactive', 'Inactive'),
 )
+
+
+ACCOUNT_TYPES = (
+    ('cash', 'cash'),
+    ('invest', 'invest'),
+    ('insurance', 'insurance'),
+    ('income', 'income'),
+)
