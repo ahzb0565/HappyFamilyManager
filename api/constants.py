@@ -51,7 +51,7 @@ STATUS = (
 
 ACCOUNT_TYPES = (
     ('cash', 'cash'),
-    ('invest', 'invest'),
+    ('investment', 'invest'),
     ('insurance', 'insurance'),
     ('income', 'income'),
 )
