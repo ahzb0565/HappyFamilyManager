@@ -11,6 +11,7 @@ const customModalStyles = {
     left                  : '50%',
     right                 : 'auto',
     bottom                : 'auto',
+    width                 : '30%',
     marginRight           : '-50%',
     transform             : 'translate(-50%, -50%)'
   }
@@ -103,7 +104,7 @@ class AddItemModal extends React.Component {
 
   afterOpenModal() {
     // references are now sync'd and can be accessed.
-    this.subtitle.style.color = '#f00';
+    this.subtitle.style.color = 'black';
   }
 
   closeModal() {
@@ -123,12 +124,20 @@ class AddItemModal extends React.Component {
           contentLabel="Example Modal"
         >
 
-          <h2 ref={subtitle => this.subtitle = subtitle}>添加项目到{this.props.type}</h2>
-          <button onClick={this.closeModal}>x</button>
+          <h2 ref={subtitle => this.subtitle = subtitle} style={{textAlign: 'center'}}>添加项目到{this.props.type}</h2>
+          <br />
           <form>
-            名称： <input /><br />
-            数量： <input /><br />
-            <Button onClick={null} value="添加"/>
+            <div className="input-group">
+              <span className="input-group-addon" id="basic-addon1">名称：</span>
+              <input type="text" className="form-control" placeholder="Name" aria-describedby="basic-addon1" />
+            </div>
+            <br />
+            <div className="input-group">
+              <span className="input-group-addon" id="basic-addon2">数量：</span>
+              <input type="text" className="form-control" placeholder="Value" aria-describedby="basic-addon2" />
+            </div>
+            <br />
+            <ButtonGroup create={null} cancel={null} />
           </form>
         </Modal>
       </div>
