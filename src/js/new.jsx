@@ -8,7 +8,7 @@ let account_types = [];
 function today(){
     // TODO: move to common
     let date = new Date();
-    return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+    return date.toISOString().substr(0, 10);
 }
 
 // Get or create today's report
@@ -21,10 +21,18 @@ function init(){
         });
 }
 
+function SmallButton(props){
+    return <a className="badge" onClick={props.onClick} style={props.style}>{props.value}</a>;
+}
+
 function Item(props){
     console.log('Generate list item, name=' + props.name);
     return (<li className="list-group-item">
-        {props.name}<span style={{float: "right"}}>{props.value}</span>
+        {props.name}
+        <span style={{float: 'right'}}>
+            {props.value}
+            <SmallButton onClick={props.remove} value="删除"/>
+        </span>
     </li>);
 }
 
@@ -33,7 +41,12 @@ function Account(props){
         return null;
     console.log('Generate list group, items=' + props.items.map((item) => item.name));
     const items = props.items;
-    const ListItems = items.map((item)=><Item key={item.name + '_' + items.indexOf(item)} name={item.name} value={item.value} />);
+    const ListItems = items.map((item)=>{
+        return (<Item key={item.name + '_' + items.indexOf(item)}
+                    name={item.name}
+                    value={item.value}
+                    remove={props.removeItem} />)
+    });
     return <ul className="list-group">
         <li className="list-group-item active">{props.type}<span style={{float: 'right'}}>+</span></li>
         {ListItems}
