@@ -1,9 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
+import Modal from 'react-modal'
 
 let report = {};
 let account_types = [];
+const customModalStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
+
 
 function today(){
     // TODO: move to common
@@ -41,6 +53,10 @@ function Account(props){
         return null;
     console.log('Generate list group, items=' + props.items.map((item) => item.name));
     const items = props.items;
+    const headStyle = {
+        backgroundColor: '#337ab7',
+        color: '#fff'
+    };
     const ListItems = items.map((item)=>{
         return (<Item key={item.name + '_' + items.indexOf(item)}
                     name={item.name}
@@ -48,7 +64,7 @@ function Account(props){
                     remove={props.removeItem} />)
     });
     return <ul className="list-group">
-        <li className="list-group-item active">{props.type}<span style={{float: 'right'}}>+</span></li>
+        <li className="list-group-item" style={headStyle}>{props.type}<AddItemModal type={props.type}/></li>
         {ListItems}
     </ul>;
 }
@@ -65,6 +81,59 @@ function ButtonGroup(props){
             <Button onClick={props.cancel} value="取消" />
         </div>
     );
+}
+
+class AddItemModal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.props = props;
+
+    this.state = {
+      modalIsOpen: false
+    };
+
+    this.openModal = this.openModal.bind(this);
+    this.afterOpenModal = this.afterOpenModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+  }
+
+  openModal() {
+    this.setState({modalIsOpen: true});
+  }
+
+  afterOpenModal() {
+    // references are now sync'd and can be accessed.
+    this.subtitle.style.color = '#f00';
+  }
+
+  closeModal() {
+    this.setState({modalIsOpen: false});
+    console.log('close Modal');
+  }
+
+  render() {
+    return (
+      <div style={{float: 'right'}}>
+        <Button onClick={this.openModal} value="添加"/>
+        <Modal
+          isOpen={this.state.modalIsOpen}
+          onAfterOpen={this.afterOpenModal}
+          onRequestClose={this.closeModal}
+          style={customModalStyles}
+          contentLabel="Example Modal"
+        >
+
+          <h2 ref={subtitle => this.subtitle = subtitle}>添加项目到{this.props.type}</h2>
+          <button onClick={this.closeModal}>x</button>
+          <form>
+            名称： <input /><br />
+            数量： <input /><br />
+            <Button onClick={null} value="添加"/>
+          </form>
+        </Modal>
+      </div>
+    );
+  }
 }
 
 class Content extends React.Component{
