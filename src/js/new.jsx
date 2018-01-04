@@ -172,9 +172,10 @@ class Content extends React.Component{
     }
 
     submit(){
-        let items = this.state.items;
+        let items = this.state.items.filter((item) => isNaN(item.id));
         let items_left = items.length;
         let self = this;
+
         for(let i = 0; i< items.length; i++){
             console.log('Creating item ' + items[i].name);
             axios.post('/api/create_item/', items[i])
@@ -195,8 +196,7 @@ class Content extends React.Component{
     addItem(item){
         console.log('add item');
         if(!item.id){
-            const max = Math.max.apply(null, this.state.items.map((item) => item.id));
-            item.id = max + 1;
+            item.id = 'new_' + (this.state.items.length + 1);
         };
         item.month = this.today;
         this.setState((prev)=>{
@@ -208,6 +208,12 @@ class Content extends React.Component{
 
     removeItem(id){
         console.log('remove item');
+        if(!isNaN(id)){
+            axios.get('/api/delete_item/' + id + '/')
+                .then(function(response){
+                    console.log('remove item success on server');
+                });
+        };
         this.setState((prev) => ({items: prev.items.filter((item) => item.id != id)}));
     }
 
