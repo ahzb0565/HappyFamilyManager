@@ -162,6 +162,7 @@ class Content extends React.Component{
     constructor(props, context){
         super(props, context);
         this.today = today();
+        this.month = null;
         this.state = {items: []};
         this.types = [];
         this.submit = this.submit.bind(this);
@@ -173,13 +174,14 @@ class Content extends React.Component{
     submit(){
         let items = this.state.items;
         let items_left = items.length;
+        let self = this;
         for(let i = 0; i< items.length; i++){
             console.log('Creating item ' + items[i].name);
             axios.post('/api/create_item/', items[i])
                 .then(function(response){
                     items_left -= 1;
                     if (items_left <= 0)
-                        this.backHome();
+                        self.backHome();
                 });
         }
         console.log('Submitted');
@@ -196,6 +198,7 @@ class Content extends React.Component{
             const max = Math.max.apply(null, this.state.items.map((item) => item.id));
             item.id = max + 1;
         };
+        item.month = this.today;
         this.setState((prev)=>{
             let prevItems = prev.items;
             prevItems.push(item);
