@@ -24,16 +24,6 @@ function today(){
     return date.toISOString().substr(0, 10);
 }
 
-// Get or create today's report
-function init(){
-    // Get account types
-    axios.get('/api/get_acount_types/')
-        .then(function(response){
-            account_types = response.data;
-            console.log('Account types=' + account_types);
-        });
-}
-
 function SmallButton(props){
     return <a className="badge" onClick={props.onClick} style={props.style}>{props.value}</a>;
 }
@@ -50,8 +40,6 @@ function Item(props){
 }
 
 function Account(props){
-    if (!props.items)
-        return null;
     console.log('Generate list group, items=' + props.items.map((item) => item.name));
     const items = props.items;
     const headStyle = {
@@ -62,10 +50,12 @@ function Account(props){
         return (<Item key={item.name + '_' + items.indexOf(item)}
                     name={item.name}
                     value={item.value}
-                    remove={props.removeItem} />)
+                    remove={() => props.removeItem(item.id)} />)
     });
     return <ul className="list-group">
-        <li className="list-group-item" style={headStyle}>{props.type}<AddItemModal type={props.type}/></li>
+        <li className="list-group-item" style={headStyle}>{props.type}
+            <AddItemModal createItem={props.addItem} type={props.type}/>
+        </li>
         {ListItems}
     </ul>;
 }
@@ -90,12 +80,14 @@ class AddItemModal extends React.Component {
     this.props = props;
 
     this.state = {
-      modalIsOpen: false
+      modalIsOpen: false,
+      item: {name: null, value:0, type: this.props.type}
     };
 
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   openModal() {
@@ -105,6 +97,17 @@ class AddItemModal extends React.Component {
   afterOpenModal() {
     // references are now sync'd and can be accessed.
     this.subtitle.style.color = 'black';
+  }
+
+  handleInputChange(e){
+    let key = e.target.name == 'name'? 'name': 'value';
+    let value = e.target.value;
+
+    this.setState((prev) => {
+        let newState = prev.item;
+        newState[key] = value;
+        return newState;
+    });
   }
 
   closeModal() {
@@ -129,15 +132,25 @@ class AddItemModal extends React.Component {
           <form>
             <div className="input-group">
               <span className="input-group-addon" id="basic-addon1">名称：</span>
-              <input type="text" className="form-control" placeholder="Name" aria-describedby="basic-addon1" />
+              <input type="text" className="form-control"
+                placeholder="Name" aria-describedby="basic-addon1" name="name"
+                onChange={this.handleInputChange}
+              />
             </div>
             <br />
             <div className="input-group">
               <span className="input-group-addon" id="basic-addon2">数量：</span>
-              <input type="text" className="form-control" placeholder="Value" aria-describedby="basic-addon2" />
+              <input type="number" className="form-control" placeholder="Value"
+                aria-describedby="basic-addon2" name="value"
+                onChange={this.handleInputChange}
+              />
             </div>
             <br />
-            <ButtonGroup create={null} cancel={null} />
+            <ButtonGroup create={(e) => {
+                e.preventDefault();
+                this.props.createItem(this.state.item);
+                this.closeModal();
+            }} cancel={null} />
           </form>
         </Modal>
       </div>
@@ -148,30 +161,22 @@ class AddItemModal extends React.Component {
 class Content extends React.Component{
     constructor(props, context){
         super(props, context);
-        this.state = {
-            month: today(),
-            cashAndBackup: [],
-            income: [],
-            investment: [],
-            insurance: []
-        };
+        this.today = today();
+        this.state = {items: []};
+        this.types = [];
         this.submit = this.submit.bind(this);
         this.backHome = this.backHome.bind(this);
+        this.addItem = this.addItem.bind(this);
+        this.removeItem = this.removeItem.bind(this);
     }
 
     submit(){
-        let items = [
-            this.state.cashAndBackup,
-            this.state.income,
-            this.state.investment,
-            this.state.insurance,
-        ].reduce((a, b)=>a.concat(b));
+        let items = this.state.items;
         let items_left = items.length;
         for(let i = 0; i< items.length; i++){
             console.log('Creating item ' + items[i].name);
             axios.post('/api/create_item/', items[i])
                 .then(function(response){
-                    console.log(response);
                     items_left -= 1;
                     if (items_left <= 0)
                         this.backHome();
@@ -185,42 +190,59 @@ class Content extends React.Component{
         window.location.href = '/';
     }
 
+    addItem(item){
+        console.log('add item');
+        if(!item.id){
+            const max = Math.max.apply(null, this.state.items.map((item) => item.id));
+            item.id = max + 1;
+        };
+        this.setState((prev)=>{
+            let prevItems = prev.items;
+            prevItems.push(item);
+            return {items: prevItems};
+        });
+    }
+
+    removeItem(id){
+        console.log('remove item');
+        this.setState((prev) => ({items: prev.items.filter((item) => item.id != id)}));
+    }
+
     componentDidMount(){
         console.log('did mount');
+        let self = this;
+        // Get types
+        axios.get('/api/get_acount_types/')
+        .then(function(response){
+            self.types = response.data;
+        });
         // create monthly report
         axios.get('/api/create_report/' + today() + '/')
             .then(function(response){
-                console.log(response.data);
-                const items = response.data.items;
-
+                self.setState({items: response.data.items});
             });
-        const items = [
-            {name: 'first', value: 100, type: 'cash', month: today()},
-            {name: 'Second', value: 200, type: 'cash', month: today()},
-            {name: 'third', value: 300, type: 'cash', month: today()}
-        ];
-        this.setState({cashAndBackup: items});
-        this.setState({income: items});
-        this.setState({investment: items});
-        this.setState({insurance: items});
     }
 
     render(){
+        const items = this.state.items;
+        const accounts = {};
+        this.types.forEach((type) => accounts[type] = []);
+        this.state.items.forEach((item) => accounts[item.type].push(item));
+
+        const accountList = Object.keys(accounts).map((type) => {
+            return (<Account
+                key={type}
+                items={accounts[type]}
+                type={type}
+                removeItem={this.removeItem}
+                addItem={this.addItem}
+            />)
+        });
+
         return(
             <div>
                 <div id="content" className="row">
-                    <div className="col-md-4">
-                        <Account items={this.state.income} type="收入" />
-                    </div>
-                    <div className="col-md-4">
-                        <Account items={this.state.cashAndBackup} type="现金备用金" />
-                    </div>
-                    <div className="col-md-4">
-                        <Account items={this.state.investment} type="投资账户" />
-                    </div>
-                    <div className="col-md-4">
-                        <Account items={this.state.insurance} type="保险账户" />
-                    </div>
+                    {accountList}
                 </div>
                 <div className="row">
                     <ButtonGroup create={this.submit} cancel={this.backHome} />
@@ -229,8 +251,5 @@ class Content extends React.Component{
         );
     }
 }
-
-// Start from here
-init();
 
 ReactDOM.render(<Content />, document.getElementById('content'));
