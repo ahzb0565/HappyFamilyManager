@@ -9,42 +9,11 @@
 
 {% block body %}
     <div id="info">
-        <h1>月账单详情 <small>2017.10.01</small></h1>
+        <h1>月账单详情 <small id="showdate"></small></h1>
     </div>
-    <div id="accounts" >
-        <div class="col-md-4">
-            <div id="cashAndBackup" class="panel panel-default">
-                <div class="panel-heading">现金备用金</div>
-                <div  class="panel-body">
-                    <p>Cash and Backup</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div id="investmentAccount" class="panel panel-default">
-                <div class="panel-heading">投资账户</div>
-                <div class="panel-body">
-                    <p>支付宝</p>
-                    <p>股票</p>
-                    <p>蚂蚁金服</p>
-                    <p>南方基金</p>
-                    <p>华夏基金</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div id="insuranceAccount" class="panel panel-default">
-                <div class="panel-heading">保险账户</div>
-                <div class="panel-body">
-                    <p>意外险</p>
-                    <p>重疾</p>
-                    <p>养老</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="content" class="row"></div>
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{% static 'dist/index.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dist/details.bundle.js' %}"></script>
 {% endblock %}

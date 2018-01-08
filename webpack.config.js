@@ -4,7 +4,8 @@ module.exports = {
   entry: {
     index: './src/js/index.jsx',
     home: './src/js/home.jsx',
-    create_new: './src/js/new.jsx'
+    create_new: './src/js/new.jsx',
+    details: './src/js/details.jsx'
   },
   output: {
     path: __dirname + '/static/dist',  //abs path

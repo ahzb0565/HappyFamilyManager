@@ -23,7 +23,7 @@ function Item(props){
         {props.name}
         <span style={{float: 'right'}}>
             {props.value}
-            <SmallButton onClick={props.remove} value="删除"/>
+            {!props.readOnly && <SmallButton onClick={props.remove} value="删除"/>}
         </span>
     </li>);
 }
@@ -116,6 +116,7 @@ class AddItemModal extends React.Component {
 function Account(props){
     console.log('Generate list group, items=' + props.items.map((item) => item.name));
     const items = props.items;
+    const readOnly = props.readOnly;
     const headStyle = {
         backgroundColor: '#337ab7',
         color: '#fff'
@@ -124,11 +125,12 @@ function Account(props){
         return (<Item key={item.name + '_' + items.indexOf(item)}
                     name={item.name}
                     value={item.value}
-                    remove={() => props.removeItem(item.id)} />)
+                    remove={() => props.removeItem(item.id)}
+                    readOnly={props.readOnly} />)
     });
-    return <ul className="list-group">
+    return <ul className="list-group col-md-4">
         <li className="list-group-item" style={headStyle}>{props.type}
-            <AddItemModal createItem={props.addItem} type={props.type}/>
+            {!readOnly && <AddItemModal createItem={props.addItem} type={props.type}/>}
         </li>
         {ListItems}
     </ul>;

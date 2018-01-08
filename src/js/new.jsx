@@ -88,7 +88,7 @@ class Content extends React.Component{
             self.types = response.data;
         });
         // create monthly report
-        axios.get('/api/create_report/' + today() + '/')
+        axios.get('/api/create_report/' + this.today + '/')
             .then(function(response){
                 self.setState({items: response.data.items});
             });
@@ -107,6 +107,7 @@ class Content extends React.Component{
                 type={type}
                 removeItem={this.removeItem}
                 addItem={this.addItem}
+                readOnly={false}
             />)
         });
 
