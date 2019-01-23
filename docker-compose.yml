@@ -1,0 +1,27 @@
+version: '3'
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    image: backend:v1
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./data:/data
+  nginx_proxy:
+    build:
+      context: ./nginx_proxy
+      dockerfile: Dockerfile
+    image: nginx_proxy:v1
+    ports:
+      - 8000:80
+    depends_on:
+      - backend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: frontend:v1
+    ports:
+      - 8002:8080
