@@ -4,7 +4,7 @@ services:
     build: 
       context: ./backend
       dockerfile: Dockerfile
-    image: backend:v1
+    image: backend:latest
     ports:
       - "8001:8000"
     volumes:
@@ -13,7 +13,7 @@ services:
     build:
       context: ./nginx_proxy
       dockerfile: Dockerfile
-    image: nginx_proxy:v1
+    image: nginx_proxy:latest
     ports:
       - 8000:80
     depends_on:
@@ -23,6 +23,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    image: frontend:v1
+    image: frontend:latest
     ports:
       - 8002:8080
